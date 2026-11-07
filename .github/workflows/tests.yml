@@ -1,0 +1,19 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      # `npm ci` respecte package-lock.json : pas de dépendance surprise en CI.
+      - run: npm ci
+      # Les vérifications sont hors ligne : aucun token, aucune base, aucun réseau.
+      - run: npm test

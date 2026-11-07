@@ -1,0 +1,39 @@
+# ── Secrets — JAMAIS sur GitHub ──────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Dépendances ──────────────────────────────────────────────────────────
+node_modules/
+site/node_modules/
+
+# ── Builds Next.js ───────────────────────────────────────────────────────
+site/.next/
+site/out/
+
+# ── Binaires audio (yt-dlp / ffmpeg) téléchargés par `npm run music:setup` ─
+bin/
+
+# ── Logs & caches ────────────────────────────────────────────────────────
+*.log
+.freebuff/
+
+# ── Divers ───────────────────────────────────────────────────────────────
+tests.zip
+Thumbs.db
+.DS_Store
+
+# Anti-VPN — binaire cloudflared téléchargé automatiquement (voir ANTIVPN.md)
+tools/cloudflared.exe
+tools/cloudflared
+
+# ── Copies et archives locales (jamais publiées) ─────────────────────────
+# Copie de travail bêta abandonnée : elle ne fait pas partie du dépôt public.
+cobalt/
+SITE.zip
+
+# Dossiers d'outillage local (et leur archive : jamais dans le dépôt)
+.cloud-attachments/
+.cloud-attachments.zip
+.verify/
+.npm/

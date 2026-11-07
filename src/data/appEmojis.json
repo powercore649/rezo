@@ -1,0 +1,94 @@
+{
+  "rezo_fleche": {
+    "id": "1568645412351381647",
+    "animated": true
+  },
+  "rezo_valide": {
+    "id": "1568645416671645753",
+    "animated": true
+  },
+  "rezo_alerte": {
+    "id": "1568645419947270204",
+    "animated": true
+  },
+  "rezo_chargement": {
+    "id": "1568645422719832227",
+    "animated": true
+  },
+  "rezo_bouclier": {
+    "id": "1568645425731477727",
+    "animated": true
+  },
+  "rezo_sirene": {
+    "id": "1568645429099372567",
+    "animated": true
+  },
+  "rezo_punaise": {
+    "id": "1568645432387706902",
+    "animated": true
+  },
+  "rezo_poubelle": {
+    "id": "1568645435533426788",
+    "animated": true
+  },
+  "rezo_corbeille": {
+    "id": "1568645438909845564",
+    "animated": true
+  },
+  "rezo_muet": {
+    "id": "1568645442185465927",
+    "animated": true
+  },
+  "rezo_attention": {
+    "id": "1568645444697858051",
+    "animated": true
+  },
+  "rezo_gemme": {
+    "id": "1568645447646445663",
+    "animated": true
+  },
+  "rezo_argent": {
+    "id": "1568645450792308916",
+    "animated": true
+  },
+  "rezo_calcul": {
+    "id": "1568645453631721633",
+    "animated": true
+  },
+  "rezo_cone": {
+    "id": "1568645456651755531",
+    "animated": true
+  },
+  "rezo_suivant": {
+    "id": "1568645459860398121",
+    "animated": true
+  },
+  "rezo_points": {
+    "id": "1568645464318943282",
+    "animated": true
+  },
+  "rezo_check_bleu": {
+    "id": "1568645467384844469",
+    "animated": true
+  },
+  "rezo_check_noir": {
+    "id": "1568645470622974113",
+    "animated": true
+  },
+  "rezo_triangle": {
+    "id": "1568645473705656330",
+    "animated": true
+  },
+  "rezo_fete": {
+    "id": "1568645477249978509",
+    "animated": true
+  },
+  "rezo_steve": {
+    "id": "1568645480446034102",
+    "animated": true
+  },
+  "rezo_dank": {
+    "id": "1568645484220915892",
+    "animated": true
+  }
+}
