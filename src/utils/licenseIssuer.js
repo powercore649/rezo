@@ -17,6 +17,7 @@
 const crypto = require('crypto');
 const License = require('../models/License');
 const { resolvePlan } = require('./licensePlans');
+const masterLicense = require('./masterLicense');
 
 const KEY_PATTERN = /^REZO-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
 const CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // ni O, ni I, ni 0, ni 1
@@ -62,6 +63,15 @@ async function issueKey({
   maxGuilds = null, graceDays = null, extras = null, allowQuote = false,
 } = {}) {
   if (!createdBy) return { ok: false, error: 'createdBy requis' };
+
+  // ── Licence maître ────────────────────────────────────────────────────────
+  // Le dépôt est public : sans jeton maître signé, une copie du bot ne doit pas
+  // pouvoir fabriquer de clés. Ce module est le point d'émission du site et des
+  // devis ; `licenseGate.createLicense` garde celui du bot.
+  const master = masterLicense.guard();
+  if (!master.ok) {
+    return { ok: false, code: 'master_locked', reason: master.reason, error: master.message };
+  }
 
   const plan = resolvePlan(planId);
   if (!plan) return { ok: false, error: `offre inconnue : ${planId}` };

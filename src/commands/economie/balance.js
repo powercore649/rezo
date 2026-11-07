@@ -418,7 +418,9 @@ async function purchaseLicense(interaction, cfg, coin) {
     });
     const why = grant.reason === 'unlimited'
       ? 'ce serveur a déjà une licence illimitée'
-      : 'la licence n\'a pas pu être délivrée';
+      : grant.reason === 'issuer_locked'
+        ? 'cette instance du bot n’a pas de licence maître valide : elle ne peut émettre aucune clé'
+        : 'la licence n\'a pas pu être délivrée';
     const refundLine = refund.ok
       ? 'Tes pièces ont été **remboursées**.'
       : '⚠️ **Le remboursement a échoué** — contacte un administrateur avec l\'heure de l\'achat.';

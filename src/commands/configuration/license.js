@@ -19,6 +19,7 @@ const License     = require('../../models/License');
 const Trial       = require('../../models/Trial');
 const licenseGate = require('../../utils/licenseGate');
 const licenseCore = require('../../utils/licenseCore');
+const masterLicense = require('../../utils/masterLicense');
 const { publicPacks, formatPrice } = require('../../utils/licensePlans');
 const { sitePath } = require('../../utils/siteUrl');
 const { COLORS, successEmbed, errorEmbed } = require('../../utils/embeds');
@@ -46,6 +47,24 @@ function licenseLine(l) {
     ? `**${l.guildName || seats[0]}**${seats.length > 1 ? ` +${seats.length - 1}` : ''}`
     : '**—**';
   return `${s} ${kind.emoji} \`${keyPreview(l.key)}\` → ${where} (${exp})`;
+}
+
+// Le système de licence est lui-même protégé : sans licence maître signée,
+// aucune émission, prolongation, révocation ou transfert n'est possible.
+function masterLockedEmbed(state) {
+  return new EmbedBuilder()
+    .setColor(COLORS.warning)
+    .setTitle('🔐 Système de licence verrouillé')
+    .setDescription(
+      `${masterLicense.message(state.reason)}\n\n`
+      + 'Le système de licence est protégé par une **licence maître signée** (Ed25519) : '
+      + 'sans elle, aucune clé ne peut être générée, prolongée, transférée ou révoquée.\n\n'
+      + '**Sur la machine qui héberge le bot :**\n'
+      + '```\nnpm run master:check\nnpm run master:sign -- --days 365\n```\n'
+      + 'Le jeton s’écrit dans `.env` → `MASTER_LICENSE` ; la clé privée reste dans '
+      + '`MASTER_SIGNING_KEY`, jamais versionnée. Un redémarrage applique le nouveau jeton.',
+    )
+    .setFooter({ text: 'REZO • Licence maître' });
 }
 
 function trialLine(t) {
@@ -445,6 +464,14 @@ module.exports = {
       return interaction.reply({ embeds: [errorEmbed('Accès refusé', 'Section réservée au propriétaire du bot.')], ephemeral: true });
     }
 
+    // ── Licence maître ──────────────────────────────────────────────────────
+    // Toute la section owner modifie le système de licence : elle exige donc la
+    // licence maître, pas seulement l'identifiant OWNER_IDS.
+    const masterState = masterLicense.status();
+    if (!masterState.ok) {
+      return interaction.reply({ embeds: [masterLockedEmbed(masterState)], ephemeral: true });
+    }
+
     // ── Ouvrir panel admin ──────────────────────────────────────────────────
     if (id === 'lc_admin_panel') {
       const cfg   = licenseGate.getTrialConfig();
@@ -685,6 +712,12 @@ module.exports = {
       return interaction.reply({ embeds: [errorEmbed('Accès refusé', 'Section réservée au propriétaire du bot.')], ephemeral: true });
     }
 
+    // ── Licence maître ──────────────────────────────────────────────────────
+    const masterState = masterLicense.status();
+    if (!masterState.ok) {
+      return interaction.reply({ embeds: [masterLockedEmbed(masterState)], ephemeral: true });
+    }
+
     // ── Prolonger une licence ───────────────────────────────────────────────
     if (id === 'lc_modal_extend') {
       const key   = interaction.fields.getTextInputValue('key').trim();
@@ -770,6 +803,9 @@ module.exports = {
           jours, note, kind: kind.id, maxGuilds: kind.maxGuilds, planId: kind.id,
         });
       } catch (err) {
+        if (err?.code === 'master_locked') {
+          return interaction.editReply({ embeds: [masterLockedEmbed({ reason: err.reason, message: err.message })] });
+        }
         console.error('[license] génération impossible :', err.message);
         return interaction.editReply({
           embeds: [errorEmbed('Génération impossible',

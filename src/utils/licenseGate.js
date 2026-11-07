@@ -26,6 +26,7 @@ const License = require('../models/License');
 const Trial   = require('../models/Trial');
 const { COLORS } = require('./embeds');
 const core    = require('./licenseCore');
+const masterLicense = require('./masterLicense');
 
 // ── Format de clé ─────────────────────────────────────────────────────────────
 // REZO-XXXX-XXXX-XXXX-XXXX, alphabet sans caractères ambigus (I/L/O/0/1).
@@ -169,6 +170,16 @@ function generateKey(random = Math.random) {
 }
 
 async function createLicense(ownerId, { jours = null, note = '', kind = 'standard', maxGuilds = null, graceDays = null, planId = 'custom' } = {}) {
+  // Le système de licence est lui-même protégé par la licence maître : sans
+  // jeton signé valide, cette instance n'a pas le droit d'émettre une clé.
+  const master = masterLicense.guard();
+  if (!master.ok) {
+    const err = new Error(master.message);
+    err.code = 'master_locked';
+    err.reason = master.reason;
+    throw err;
+  }
+
   const info = core.kindInfo(kind);
   for (let attempt = 0; attempt < 10; attempt++) {
     try {
@@ -741,7 +752,15 @@ async function grantLicense(guildId, guildName, activatedBy, { days = 30, note =
     await existing.save();
   }
 
-  const license = await createLicense(activatedBy, { jours: days, note, planId: 'coins' });
+  let license;
+  try {
+    license = await createLicense(activatedBy, { jours: days, note, planId: 'coins' });
+  } catch (err) {
+    // Instance sans licence maître : l'achat en pièces ne peut pas émettre.
+    if (err?.code === 'master_locked') return { ok: false, reason: 'issuer_locked' };
+    throw err;
+  }
+
   license.guildId     = String(guildId);
   license.guildIds    = [String(guildId)];
   license.seatsUsed   = 1;

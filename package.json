@@ -50,6 +50,9 @@
     "site": "node scripts/store-server.js",
     "emojis:import": "node scripts/import-emojis.js",
     "emojis:check": "node scripts/import-emojis.js --dry-run",
+    "master:init": "node scripts/master-license.js init",
+    "master:sign": "node scripts/master-license.js sign",
+    "master:check": "node scripts/master-license.js check",
     "mail:test": "node scripts/mail-test.js",
     "test:radio": "node tests/radio-smoke.js",
     "test:store": "node tests/store-smoke.js"
